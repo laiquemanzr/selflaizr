@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaizrStudy - Focus Timer</title>
+    <style>
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Patrick+Hand&family=Quicksand:wght@400;500;600&family=Comfortaa:wght@400;500;600&display=swap');
+
+        /* CSS Variables for Themes */
+        :root {
+            /* Default Theme (Pastel Blue) */
+            --primary-color: #8ECAE6;
+            --secondary-color: #219EBC;
+            --accent-color: #023047;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        /* Theme 2: Soft Green */
+        .theme-green {
+            --primary-color: #A8E6CF;
+            --secondary-color: #6BCF8D;
+            --accent-color: #2E8B57;
+            --background-color: #f0f9f4;
+            --card-color: #ffffff;
+            --text-color: #2d5016;
+        }
+
+        /* Theme 3: Light Pink */
+        .theme-pink {
+            --primary-color: #FFB6C1;
+            --secondary-color: #FF91A4;
+            --accent-color: #C71585;
+            --background-color: #fff5f7;
+            --card-color: #ffffff;
+            --text-color: #6d213c;
+        }
+
+        /* Theme 4: Cream */
+        .theme-cream {
+            --primary-color: #F4E4C1;
+            --secondary-color: #E6D2AA;
+            --accent-color: #A67B5B;
+            --background-color: #fefcf5;
+            --card-color: #ffffff;
+            --text-color: #5a4a42;
+        }
+
+        /* Theme 5: Light Gray */
+        .theme-gray {
+            --primary-color: #E0E0E0;
+            --secondary-color: #9E9E9E;
+            --accent-color: #424242;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #212121;
+        }
+
+        /* Theme 6: Dark Chocolate */
+        .theme-chocolate {
+            --primary-color: #D7CCC8;
+            --secondary-color: #A1887F;
+            --accent-color: #5D4037;
+            --background-color: #EFEBE9;
+            --card-color: #ffffff;
+            --text-color: #3E2723;
+        }
+
+        /* Theme 7: Dark Charcoal */
+        .theme-charcoal {
+            --primary-color: #616161;
+            --secondary-color: #424242;
+            --accent-color: #212121;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #000000;
+        }
+
+        /* Dim Mode */
+        .dim-mode .timer-display {
+            color: rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .dim-mode .fullscreen-timer .timer-display {
+            color: rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Fullscreen styles */
+        .fullscreen-timer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--background-color);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .fullscreen-timer .timer-display {
+            font-size: 10rem;
+            margin: 30px 0;
+        }
+
+        .fullscreen-timer .timer-mode {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+        }
+
+        .fullscreen-timer .timer-controls {
+            margin-bottom: 40px;
+        }
+
+        .fullscreen-timer .exit-fullscreen {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            color: var(--text-color);
+        }
+
+        .fullscreen-timer .exit-fullscreen:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Sound Controls */
+        .sound-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .sound-btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            background-color: rgba(142, 202, 230, 0.2);
+            border: 1px solid var(--primary-color);
+        }
+
+        .sound-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* NEET Countdown - Compact Version */
+        .neet-countdown {
+            padding: 8px 15px;
+            background-color: rgba(142, 202, 230, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: fit-content;
+        }
+
+        .neet-title {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+
+        .neet-timer {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+
+        /* Session Timeline */
+        .session-timeline {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: rgba(142, 202, 230, 0.1);
+            border-radius: 12px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .clear-sessions {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff6b6b;
+            color: #d63031;
+        }
+
+        .timeline-items {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background-color: var(--card-color);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .timeline-item.break {
+            border-left-color: #ff9f43;
+            background-color: rgba(255, 159, 67, 0.1);
+        }
+
+        .session-time {
+            font-weight: 500;
+            color: var(--accent-color);
+        }
+
+        .session-duration {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .session-gap {
+            font-size: 0.8rem;
+            color: #d63031;
+            background-color: rgba(214, 48, 49, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-top: 4px;
+        }
+
+        .no-sessions {
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.6;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-main {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-color);
+            background-color: var(--card-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            cursor: pointer;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 i {
+            color: var(--secondary-color);
+        }
+
+        /* Timer Styles */
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .timer-display {
+            font-size: 6rem;
+            font-weight: 600;
+            margin: 20px 0;
+            color: var(--accent-color);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-mode {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .timer-controls button {
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+
+        .timer-settings {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .setting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .setting input {
+            width: 80px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-color);
+            background-color: var(--card-color);
+            color: var(--text-color);
+            text-align: center;
+            font-family: var(--font-family);
+        }
+
+        /* Fullscreen icon in timer card */
+        .fullscreen-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .fullscreen-icon:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* To-Do List Styles */
+        .todo-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .todo-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-color);
+            background-color: var(--card-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            outline: none;
+        }
+
+        .todo-list {
+            list-style-type: none;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: rgba(142, 202, 230, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .todo-item.completed {
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+
+        .todo-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .todo-text {
+            flex: 1;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .todo-actions button {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background: none;
+            border: none;
+            color: var(--text-color);
+        }
+
+        .todo-actions button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Thoughts Section Styles */
+        .thoughts-container {
+            margin-top: 20px;
+        }
+
+        .thoughts-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .format-btn {
+            padding: 6px 12px;
+            background-color: rgba(142, 202, 230, 0.2);
+            border: 1px solid var(--primary-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .format-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .thoughts-content {
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            background-color: rgba(142, 202, 230, 0.1);
+            color: var(--text-color);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: var(--font-family);
+        }
+
+        .thoughts-content:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .thoughts-content[placeholder]:empty:before {
+            content: attr(placeholder);
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Stats Styles */
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: rgba(142, 202, 230, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        /* Graph Styles */
+        .graph-container {
+            margin-top: 20px;
+        }
+
+        .graph {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 20px;
+            background-color: rgba(142, 202, 230, 0.1);
+            border-radius: 12px;
+        }
+
+        .graph-bar {
+            flex: 1;
+            background-color: var(--primary-color);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            min-height: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .graph-bar:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .graph-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .graph-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .graph-title {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .timer-display {
+                font-size: 4rem;
+            }
+            
+            .timer-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .timer-controls button {
+                width: 100%;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .fullscreen-timer .timer-display {
+                font-size: 6rem;
+            }
+            
+            .fullscreen-timer .timer-mode {
+                font-size: 1.8rem;
+            }
+            
+            .header-main {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .neet-countdown {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-main">
+                <div class="logo">
+                    <span class="logo-icon">⏱️</span>
+                    <h1>LaizrStudy</h1>
+                </div>
+                <!-- NEET Countdown - Compact Version -->
+                <div class="neet-countdown">
+                    <div class="neet-title">NEET 2026:</div>
+                    <div class="neet-timer" id="neet-countdown">Loading...</div>
+                </div>
+            </div>
+            <div class="controls">
+                <select id="theme-selector">
+                    <option value="default">Pastel Blue</option>
+                    <option value="green">Soft Green</option>
+                    <option value="pink">Light Pink</option>
+                    <option value="cream">Cream</option>
+                    <option value="gray">Light Gray</option>
+                    <option value="chocolate">Dark Chocolate</option>
+                    <option value="charcoal">Dark Charcoal</option>
+                </select>
+                <select id="font-selector">
+                    <option value="Poppins">Poppins</option>
+                    <option value="Patrick Hand">Patrick Hand</option>
+                    <option value="Quicksand">Quicksand</option>
+                    <option value="Comfortaa">Comfortaa</option>
+                </select>
+                <button id="dim-mode-btn">Dim Timer</button>
+                <button id="fullscreen-app">Fullscreen App</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Timer Section -->
+            <div class="card">
+                <button class="fullscreen-icon" id="timer-fullscreen-icon" title="Fullscreen Timer">⛶</button>
+                <h2><span>🍅</span> Pomodoro Timer</h2>
+                <div class="timer-container">
+                    <div class="timer-mode" id="timer-mode">Study Time</div>
+                    <div class="timer-display" id="timer-display">25:00</div>
+                    <div class="timer-controls">
+                        <button id="start-btn">Start</button>
+                        <button id="pause-btn">Pause</button>
+                        <button id="reset-btn">Reset</button>
+                    </div>
+                    <div class="timer-settings">
+                        <div class="setting">
+                            <label for="study-time">Study (minutes)</label>
+                            <input type="number" id="study-time" min="1" max="60" value="25">
+                        </div>
+                        <div class="setting">
+                            <label for="break-time">Break (minutes)</label>
+                            <input type="number" id="break-time" min="1" max="30" value="5">
+                        </div>
+                    </div>
+                    <!-- Sound Controls -->
+                    <div class="sound-controls">
+                        <div class="setting">
+                            <label>Session End Sound</label>
+                            <div>
+                                <button class="sound-btn active" data-sound="bell">🔔 Bell</button>
+                                <button class="sound-btn" data-sound="chime">🎵 Chime</button>
+                                <button class="sound-btn" data-sound="beep">🔊 Beep</button>
+                                <button class="sound-btn" data-sound="none">🔇 Mute</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- To-Do List Section -->
+            <div class="card">
+                <h2><span>📝</span> To-Do List</h2>
+                <div class="todo-input">
+                    <input type="text" id="todo-input" placeholder="Add a new task...">
+                    <button id="add-todo-btn">Add</button>
+                </div>
+                <ul class="todo-list" id="todo-list">
+                    <!-- To-do items will be added here dynamically -->
+                </ul>
+                
+                <!-- Thoughts Section -->
+                <div class="thoughts-container">
+                    <h2><span>💭</span> Thoughts</h2>
+                    <div class="thoughts-toolbar">
+                        <button class="format-btn" id="bullet-list">• Bullet List</button>
+                        <button class="format-btn" id="numbered-list">1. Numbered List</button>
+                        <button class="format-btn" id="clear-thoughts">Clear Thoughts</button>
+                    </div>
+                    <div class="thoughts-content" id="thoughts-content" contenteditable="true" placeholder="Write your thoughts here in pointwise/To-Do style..."></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="card">
+            <h2><span>📊</span> Study Statistics</h2>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value" id="sessions-count">0</div>
+                    <div class="stat-label">Sessions Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-time">0 min</div>
+                    <div class="stat-label">Total Study Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="today-time">0 min</div>
+                    <div class="stat-label">Today's Study Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="weekly-time">0 min</div>
+                    <div class="stat-label">Weekly Average</div>
+                </div>
+            </div>
+
+            <!-- Study Graph -->
+            <div class="graph-container">
+                <div class="graph-title">Study Time This Week (minutes)</div>
+                <div class="graph" id="study-graph">
+                    <!-- Graph bars will be added dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Timeline Section -->
+        <div class="card" style="margin-top: 30px;">
+            <h2><span>📅</span> Today's Study Sessions</h2>
+            <div class="session-timeline">
+                <div class="timeline-header">
+                    <div class="timeline-title">Session Timeline</div>
+                    <button class="clear-sessions" id="clear-sessions">Clear History</button>
+                </div>
+                <div class="timeline-items" id="timeline-items">
+                    <div class="no-sessions">No study sessions recorded today</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>LaizrStudy - Your Focus Companion for NEET 2026</p>
+        </footer>
+    </div>
+
+    <!-- Fullscreen Timer Overlay -->
+    <div id="fullscreen-timer-overlay" class="fullscreen-timer" style="display: none;">
+        <button class="exit-fullscreen" id="exit-fullscreen-timer">✕</button>
+        <div class="timer-mode" id="fullscreen-timer-mode">Study Time</div>
+        <div class="timer-display" id="fullscreen-timer-display">25:00</div>
+        <div class="timer-controls">
+            <button id="fullscreen-start-btn">Start</button>
+            <button id="fullscreen-pause-btn">Pause</button>
+            <button id="fullscreen-reset-btn">Reset</button>
+            <button id="fullscreen-dim-btn">Dim Timer</button>
+        </div>
+        <!-- Sound Controls in Fullscreen -->
+        <div class="sound-controls">
+            <button class="sound-btn active" data-sound="bell">🔔 Bell</button>
+            <button class="sound-btn" data-sound="chime">🎵 Chime</button>
+            <button class="sound-btn" data-sound="beep">🔊 Beep</button>
+            <button class="sound-btn" data-sound="none">🔇 Mute</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const themeSelector = document.getElementById('theme-selector');
+        const fontSelector = document.getElementById('font-selector');
+        const timerDisplay = document.getElementById('timer-display');
+        const timerMode = document.getElementById('timer-mode');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const studyTimeInput = document.getElementById('study-time');
+        const breakTimeInput = document.getElementById('break-time');
+        const todoInput = document.getElementById('todo-input');
+        const addTodoBtn = document.getElementById('add-todo-btn');
+        const todoList = document.getElementById('todo-list');
+        const sessionsCount = document.getElementById('sessions-count');
+        const totalTime = document.getElementById('total-time');
+        const todayTime = document.getElementById('today-time');
+        const weeklyTime = document.getElementById('weekly-time');
+        const fullscreenAppBtn = document.getElementById('fullscreen-app');
+        const timerFullscreenIcon = document.getElementById('timer-fullscreen-icon');
+        const fullscreenTimerOverlay = document.getElementById('fullscreen-timer-overlay');
+        const exitFullscreenTimerBtn = document.getElementById('exit-fullscreen-timer');
+        const fullscreenTimerDisplay = document.getElementById('fullscreen-timer-display');
+        const fullscreenTimerMode = document.getElementById('fullscreen-timer-mode');
+        const fullscreenStartBtn = document.getElementById('fullscreen-start-btn');
+        const fullscreenPauseBtn = document.getElementById('fullscreen-pause-btn');
+        const fullscreenResetBtn = document.getElementById('fullscreen-reset-btn');
+        const fullscreenDimBtn = document.getElementById('fullscreen-dim-btn');
+        const dimModeBtn = document.getElementById('dim-mode-btn');
+        const studyGraph = document.getElementById('study-graph');
+        const soundBtns = document.querySelectorAll('.sound-btn');
+        const timelineItems = document.getElementById('timeline-items');
+        const clearSessionsBtn = document.getElementById('clear-sessions');
+        const neetCountdown = document.getElementById('neet-countdown');
+        
+        // Thoughts section elements
+        const thoughtsContent = document.getElementById('thoughts-content');
+        const bulletListBtn = document.getElementById('bullet-list');
+        const numberedListBtn = document.getElementById('numbered-list');
+        const clearThoughtsBtn = document.getElementById('clear-thoughts');
+
+        // Timer Variables
+        let timer;
+        let isRunning = false;
+        let isStudyTime = true;
+        let timeLeft = 25 * 60; // 25 minutes in seconds
+        let studyDuration = 25 * 60;
+        let breakDuration = 5 * 60;
+        let sessionsCompleted = 0;
+        let totalStudyTime = 0;
+        let isFullscreenTimerActive = false;
+        let isDimMode = false;
+        let selectedSound = 'bell'; // Default sound
+
+        // Study tracking variables
+        let todayStudyTime = 0;
+        let weeklyStudyData = {};
+        let currentSessionStart = null;
+        let lastSessionEnd = null;
+        let todaySessions = [];
+
+        // NEET Exam Date - May 2, 2026 at 2:00 PM
+        const neetExamDate = new Date('May 2, 2026 14:00:00').getTime();
+
+        // Update NEET Countdown
+        function updateNeetCountdown() {
+            const now = new Date().getTime();
+            const distance = neetExamDate - now;
+
+            if (distance < 0) {
+                neetCountdown.textContent = "Exam Completed!";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+            neetCountdown.textContent = `${days}d ${hours}h ${minutes}m`;
+        }
+
+        // Generate simple audio tones
+        function generateAudioTones() {
+            // Generate bell sound (gentle chime)
+            const bellContext = new AudioContext();
+            const bellOscillator = bellContext.createOscillator();
+            const bellGain = bellContext.createGain();
+            
+            bellOscillator.connect(bellGain);
+            bellGain.connect(bellContext.destination);
+            
+            bellOscillator.frequency.setValueAtTime(784, bellContext.currentTime); // G5
+            bellOscillator.frequency.setValueAtTime(1046, bellContext.currentTime + 0.1); // C6
+            
+            bellGain.gain.setValueAtTime(0.3, bellContext.currentTime);
+            bellGain.gain.exponentialRampToValueAtTime(0.01, bellContext.currentTime + 1);
+            
+            bellOscillator.start(bellContext.currentTime);
+            bellOscillator.stop(bellContext.currentTime + 1);
+        }
+
+        // Play notification sound
+        function playNotificationSound() {
+            if (selectedSound === 'none') return;
+            
+            try {
+                const context = new AudioContext();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+                
+                // Set sound parameters based on selection
+                switch(selectedSound) {
+                    case 'bell':
+                        oscillator.frequency.setValueAtTime(784, context.currentTime); // G5
+                        oscillator.frequency.setValueAtTime(1046, context.currentTime + 0.1); // C6
+                        gainNode.gain.setValueAtTime(0.3, context.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 1);
+                        oscillator.start(context.currentTime);
+                        oscillator.stop(context.currentTime + 1);
+                        break;
+                        
+                    case 'chime':
+                        oscillator.frequency.setValueAtTime(523, context.currentTime); // C5
+                        oscillator.frequency.setValueAtTime(659, context.currentTime + 0.2); // E5
+                        oscillator.frequency.setValueAtTime(784, context.currentTime + 0.4); // G5
+                        gainNode.gain.setValueAtTime(0.2, context.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 1.5);
+                        oscillator.start(context.currentTime);
+                        oscillator.stop(context.currentTime + 1.5);
+                        break;
+                        
+                    case 'beep':
+                        oscillator.frequency.setValueAtTime(800, context.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, context.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+                        oscillator.start(context.currentTime);
+                        oscillator.stop(context.currentTime + 0.5);
+                        break;
+                }
+            } catch (error) {
+                console.log('Audio context not supported:', error);
+            }
+        }
+
+        // Format time for display
+        function formatTime(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Format duration for display
+        function formatDuration(minutes) {
+            if (minutes < 60) {
+                return `${minutes} min`;
+            } else {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours}h ${mins}m`;
+            }
+        }
+
+        // Format gap time for display
+        function formatGap(minutes) {
+            if (minutes < 60) {
+                return `${minutes}m gap`;
+            } else {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours}h ${mins}m gap`;
+            }
+        }
+
+        // Calculate gap between sessions
+        function calculateGap(previousEnd, currentStart) {
+            if (!previousEnd) return 0;
+            const gapMs = currentStart - previousEnd;
+            return Math.round(gapMs / (1000 * 60)); // Convert to minutes
+        }
+
+        // Add session to timeline
+        function addSessionToTimeline(startTime, endTime, type, duration) {
+            const session = {
+                startTime,
+                endTime,
+                type,
+                duration,
+                gap: 0
+            };
+
+            // Calculate gap from previous session
+            if (todaySessions.length > 0) {
+                const lastSession = todaySessions[todaySessions.length - 1];
+                session.gap = calculateGap(lastSession.endTime, startTime);
+            }
+
+            todaySessions.push(session);
+            saveSessions();
+            updateTimeline();
+        }
+
+        // Update timeline display
+        function updateTimeline() {
+            timelineItems.innerHTML = '';
+
+            if (todaySessions.length === 0) {
+                timelineItems.innerHTML = '<div class="no-sessions">No study sessions recorded today</div>';
+                return;
+            }
+
+            todaySessions.forEach((session, index) => {
+                const sessionElement = document.createElement('div');
+                sessionElement.className = `timeline-item ${session.type === 'break' ? 'break' : ''}`;
+                
+                const startTime = formatTime(new Date(session.startTime));
+                const endTime = formatTime(new Date(session.endTime));
+                const duration = formatDuration(session.duration);
+                
+                let gapHtml = '';
+                if (session.gap > 0) {
+                    gapHtml = `<div class="session-gap">${formatGap(session.gap)}</div>`;
+                }
+
+                sessionElement.innerHTML = `
+                    <div>
+                        <div class="session-time">${startTime} - ${endTime}</div>
+                        <div class="session-duration">${duration} • ${session.type === 'study' ? 'Study' : 'Break'}</div>
+                        ${gapHtml}
+                    </div>
+                `;
+
+                timelineItems.appendChild(sessionElement);
+            });
+
+            // Scroll to bottom
+            timelineItems.scrollTop = timelineItems.scrollHeight;
+        }
+
+        // Clear session history
+        function clearSessions() {
+            if (confirm('Are you sure you want to clear all session history for today?')) {
+                todaySessions = [];
+                saveSessions();
+                updateTimeline();
+            }
+        }
+
+        // Save sessions to localStorage
+        function saveSessions() {
+            const today = new Date().toDateString();
+            const sessionsData = {
+                date: today,
+                sessions: todaySessions
+            };
+            localStorage.setItem('todaySessions', JSON.stringify(sessionsData));
+        }
+
+        // Load sessions from localStorage
+        function loadSessions() {
+            const saved = localStorage.getItem('todaySessions');
+            if (saved) {
+                const sessionsData = JSON.parse(saved);
+                const today = new Date().toDateString();
+                
+                // Only load sessions from today
+                if (sessionsData.date === today) {
+                    todaySessions = sessionsData.sessions || [];
+                } else {
+                    todaySessions = [];
+                }
+            } else {
+                todaySessions = [];
+            }
+            updateTimeline();
+        }
+
+        // Thoughts Section Functions
+        function insertBulletList() {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const bullet = document.createElement('div');
+                bullet.textContent = '• ';
+                range.insertNode(bullet);
+                range.collapse(false);
+                thoughtsContent.focus();
+            }
+        }
+
+        function insertNumberedList() {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const lines = thoughtsContent.innerText.split('\n');
+                let lineCount = 1;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].trim() !== '') {
+                        lineCount++;
+                    }
+                }
+                
+                const number = document.createElement('div');
+                number.textContent = `${lineCount}. `;
+                range.insertNode(number);
+                range.collapse(false);
+                thoughtsContent.focus();
+            }
+        }
+
+        function clearThoughts() {
+            if (confirm('Are you sure you want to clear all your thoughts?')) {
+                thoughtsContent.textContent = '';
+                saveThoughts();
+            }
+        }
+
+        function saveThoughts() {
+            localStorage.setItem('thoughts', thoughtsContent.innerHTML);
+        }
+
+        function loadThoughts() {
+            const savedThoughts = localStorage.getItem('thoughts');
+            if (savedThoughts) {
+                thoughtsContent.innerHTML = savedThoughts;
+            }
+        }
+
+        // Initialize weekly data
+        function initializeWeeklyData() {
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                weeklyStudyData[day] = 0;
+            });
+        }
+
+        // Get current day name
+        function getCurrentDay() {
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            return days[new Date().getDay()];
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            // Load timer state
+            const savedTimerState = localStorage.getItem('timerState');
+            if (savedTimerState) {
+                const state = JSON.parse(savedTimerState);
+                isRunning = state.isRunning;
+                isStudyTime = state.isStudyTime;
+                timeLeft = state.timeLeft;
+                studyDuration = state.studyDuration;
+                breakDuration = state.breakDuration;
+                
+                if (isRunning) {
+                    startTimer();
+                }
+            }
+            
+            // Load study stats
+            const savedStats = localStorage.getItem('studyStats');
+            if (savedStats) {
+                const stats = JSON.parse(savedStats);
+                sessionsCompleted = stats.sessionsCompleted || 0;
+                totalStudyTime = stats.totalStudyTime || 0;
+                todayStudyTime = stats.todayStudyTime || 0;
+                updateStats();
+            }
+            
+            // Load weekly study data
+            const savedWeeklyData = localStorage.getItem('weeklyStudyData');
+            if (savedWeeklyData) {
+                weeklyStudyData = JSON.parse(savedWeeklyData);
+            } else {
+                initializeWeeklyData();
+            }
+            
+            // Load to-do list
+            const savedTodos = localStorage.getItem('todoList');
+            if (savedTodos) {
+                const todos = JSON.parse(savedTodos);
+                todos.forEach(todo => {
+                    addTodoToDOM(todo.text, todo.completed, todo.id);
+                });
+            }
+            
+            // Load theme and font preferences
+            const savedTheme = localStorage.getItem('theme') || 'default';
+            themeSelector.value = savedTheme;
+            document.body.className = `theme-${savedTheme}`;
+            
+            const savedFont = localStorage.getItem('font') || 'Poppins';
+            fontSelector.value = savedFont;
+            document.documentElement.style.setProperty('--font-family', savedFont);
+            
+            // Load dim mode preference
+            const savedDimMode = localStorage.getItem('dimMode') === 'true';
+            if (savedDimMode) {
+                toggleDimMode();
+            }
+            
+            // Load sound preference
+            const savedSound = localStorage.getItem('notificationSound') || 'bell';
+            selectSound(savedSound);
+            
+            // Load sessions
+            loadSessions();
+            
+            // Load thoughts
+            loadThoughts();
+            
+            // Update timer display
+            updateTimerDisplay();
+            updateTimerMode();
+            updateGraph();
+        }
+
+        // Select sound type
+        function selectSound(soundType) {
+            selectedSound = soundType;
+            
+            // Update button states
+            soundBtns.forEach(btn => {
+                if (btn.dataset.sound === soundType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            localStorage.setItem('notificationSound', soundType);
+        }
+
+        // Save timer state to localStorage
+        function saveTimerState() {
+            const state = {
+                isRunning,
+                isStudyTime,
+                timeLeft,
+                studyDuration,
+                breakDuration
+            };
+            localStorage.setItem('timerState', JSON.stringify(state));
+        }
+
+        // Save study stats to localStorage
+        function saveStats() {
+            const stats = {
+                sessionsCompleted,
+                totalStudyTime,
+                todayStudyTime
+            };
+            localStorage.setItem('studyStats', JSON.stringify(stats));
+            localStorage.setItem('weeklyStudyData', JSON.stringify(weeklyStudyData));
+        }
+
+        // Update stats display
+        function updateStats() {
+            sessionsCount.textContent = sessionsCompleted;
+            totalTime.textContent = `${Math.floor(totalStudyTime / 60)} min`;
+            todayTime.textContent = `${Math.floor(todayStudyTime / 60)} min`;
+            
+            // Calculate weekly average
+            const days = Object.values(weeklyStudyData);
+            const weeklyTotal = days.reduce((sum, time) => sum + time, 0);
+            const weeklyAvg = Math.floor(weeklyTotal / 7 / 60);
+            weeklyTime.textContent = `${weeklyAvg} min`;
+        }
+
+        // Update study graph
+        function updateGraph() {
+            studyGraph.innerHTML = '';
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const maxTime = Math.max(...Object.values(weeklyStudyData), 1); // Avoid division by zero
+            
+            days.forEach(day => {
+                const time = weeklyStudyData[day];
+                const height = maxTime > 0 ? (time / maxTime) * 100 : 0;
+                
+                const bar = document.createElement('div');
+                bar.className = 'graph-bar';
+                bar.style.height = `${height}%`;
+                bar.innerHTML = `
+                    <div class="graph-value">${Math.floor(time / 60)}</div>
+                    <div class="graph-label">${day}</div>
+                `;
+                
+                // Highlight current day
+                if (day === getCurrentDay()) {
+                    bar.style.backgroundColor = 'var(--secondary-color)';
+                }
+                
+                studyGraph.appendChild(bar);
+            });
+        }
+
+        // Timer Functions
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                timer = setInterval(updateTimer, 1000);
+                startBtn.textContent = 'Resume';
+                fullscreenStartBtn.textContent = 'Resume';
+                
+                // Track session start time
+                currentSessionStart = new Date();
+                
+                saveTimerState();
+            }
+        }
+
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                saveTimerState();
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isStudyTime = true;
+            timeLeft = studyDuration;
+            updateTimerDisplay();
+            updateTimerMode();
+            startBtn.textContent = 'Start';
+            fullscreenStartBtn.textContent = 'Start';
+            saveTimerState();
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            
+            if (timeLeft <= 0) {
+                // Timer finished
+                clearInterval(timer);
+                isRunning = false;
+                
+                const sessionEnd = new Date();
+                const sessionDuration = Math.round((sessionEnd - currentSessionStart) / 1000); // in seconds
+                
+                // Add session to timeline
+                addSessionToTimeline(
+                    currentSessionStart.getTime(),
+                    sessionEnd.getTime(),
+                    isStudyTime ? 'study' : 'break',
+                    Math.round(sessionDuration / 60) // Convert to minutes
+                );
+                
+                // Play notification sound
+                playNotificationSound();
+                
+                if (isStudyTime) {
+                    // Study session completed
+                    sessionsCompleted++;
+                    totalStudyTime += studyDuration;
+                    todayStudyTime += studyDuration;
+                    
+                    // Update weekly data
+                    const currentDay = getCurrentDay();
+                    weeklyStudyData[currentDay] += studyDuration;
+                    
+                    saveStats();
+                    updateStats();
+                    updateGraph();
+                    
+                    // Switch to break time
+                    isStudyTime = false;
+                    timeLeft = breakDuration;
+                    timerMode.textContent = 'Break Time';
+                    fullscreenTimerMode.textContent = 'Break Time';
+                } else {
+                    // Break finished, switch back to study
+                    isStudyTime = true;
+                    timeLeft = studyDuration;
+                    timerMode.textContent = 'Study Time';
+                    fullscreenTimerMode.textContent = 'Study Time';
+                }
+                
+                // Update last session end time
+                lastSessionEnd = sessionEnd;
+                
+                updateTimerDisplay();
+                saveTimerState();
+            } else {
+                updateTimerDisplay();
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const displayText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            timerDisplay.textContent = displayText;
+            if (isFullscreenTimerActive) {
+                fullscreenTimerDisplay.textContent = displayText;
+            }
+        }
+
+        function updateTimerMode() {
+            const modeText = isStudyTime ? 'Study Time' : 'Break Time';
+            timerMode.textContent = modeText;
+            fullscreenTimerMode.textContent = modeText;
+        }
+
+        // Dim Mode Functions
+        function toggleDimMode() {
+            isDimMode = !isDimMode;
+            if (isDimMode) {
+                document.body.classList.add('dim-mode');
+                dimModeBtn.textContent = 'Normal Timer';
+                if (isFullscreenTimerActive) {
+                    fullscreenDimBtn.textContent = 'Normal Timer';
+                }
+            } else {
+                document.body.classList.remove('dim-mode');
+                dimModeBtn.textContent = 'Dim Timer';
+                if (isFullscreenTimerActive) {
+                    fullscreenDimBtn.textContent = 'Dim Timer';
+                }
+            }
+            localStorage.setItem('dimMode', isDimMode);
+        }
+
+        // Fullscreen Functions
+        function enterFullscreenTimer() {
+            isFullscreenTimerActive = true;
+            fullscreenTimerOverlay.style.display = 'flex';
+            updateTimerDisplay();
+            updateTimerMode();
+            
+            // Update dim button text in fullscreen
+            if (isDimMode) {
+                fullscreenDimBtn.textContent = 'Normal Timer';
+            } else {
+                fullscreenDimBtn.textContent = 'Dim Timer';
+            }
+        }
+
+        function exitFullscreenTimer() {
+            isFullscreenTimerActive = false;
+            fullscreenTimerOverlay.style.display = 'none';
+        }
+
+        function toggleFullscreenApp() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // To-Do List Functions
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (text) {
+                const todo = {
+                    id: Date.now(),
+                    text,
+                    completed: false
+                };
+                
+                addTodoToDOM(text, false, todo.id);
+                saveTodos();
+                todoInput.value = '';
+            }
+        }
+
+        function addTodoToDOM(text, completed, id) {
+            const li = document.createElement('li');
+            li.className = `todo-item ${completed ? 'completed' : ''}`;
+            li.dataset.id = id;
+            
+            li.innerHTML = `
+                <input type="checkbox" ${completed ? 'checked' : ''}>
+                <span class="todo-text">${text}</span>
+                <div class="todo-actions">
+                    <button class="edit-btn">Edit</button>
+                    <button class="delete-btn">Delete</button>
+                </div>
+            `;
+            
+            // Add event listeners
+            const checkbox = li.querySelector('input[type="checkbox"]');
+            checkbox.addEventListener('change', toggleTodo);
+            
+            const editBtn = li.querySelector('.edit-btn');
+            editBtn.addEventListener('click', editTodo);
+            
+            const deleteBtn = li.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', deleteTodo);
+            
+            todoList.appendChild(li);
+        }
+
+        function toggleTodo(e) {
+            const li = e.target.closest('.todo-item');
+            li.classList.toggle('completed');
+            saveTodos();
+        }
+
+        function editTodo(e) {
+            const li = e.target.closest('.todo-item');
+            const textSpan = li.querySelector('.todo-text');
+            const currentText = textSpan.textContent;
+            
+            const newText = prompt('Edit your task:', currentText);
+            if (newText !== null && newText.trim() !== '') {
+                textSpan.textContent = newText.trim();
+                saveTodos();
+            }
+        }
+
+        function deleteTodo(e) {
+            const li = e.target.closest('.todo-item');
+            li.remove();
+            saveTodos();
+        }
+
+        function saveTodos() {
+            const todos = [];
+            document.querySelectorAll('.todo-item').forEach(item => {
+                todos.push({
+                    id: item.dataset.id,
+                    text: item.querySelector('.todo-text').textContent,
+                    completed: item.classList.contains('completed')
+                });
+            });
+            localStorage.setItem('todoList', JSON.stringify(todos));
+        }
+
+        // Theme and Font Functions
+        function changeTheme() {
+            const theme = themeSelector.value;
+            document.body.className = `theme-${theme}`;
+            localStorage.setItem('theme', theme);
+        }
+
+        function changeFont() {
+            const font = fontSelector.value;
+            document.documentElement.style.setProperty('--font-family', font);
+            localStorage.setItem('font', font);
+        }
+
+        // Update timer settings
+        function updateTimerSettings() {
+            studyDuration = parseInt(studyTimeInput.value) * 60;
+            breakDuration = parseInt(breakTimeInput.value) * 60;
+            
+            if (!isRunning) {
+                if (isStudyTime) {
+                    timeLeft = studyDuration;
+                } else {
+                    timeLeft = breakDuration;
+                }
+                updateTimerDisplay();
+            }
+            
+            saveTimerState();
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        studyTimeInput.addEventListener('change', updateTimerSettings);
+        breakTimeInput.addEventListener('change', updateTimerSettings);
+        addTodoBtn.addEventListener('click', addTodo);
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+        themeSelector.addEventListener('change', changeTheme);
+        fontSelector.addEventListener('change', changeFont);
+        timerFullscreenIcon.addEventListener('click', enterFullscreenTimer);
+        fullscreenAppBtn.addEventListener('click', toggleFullscreenApp);
+        exitFullscreenTimerBtn.addEventListener('click', exitFullscreenTimer);
+        fullscreenStartBtn.addEventListener('click', startTimer);
+        fullscreenPauseBtn.addEventListener('click', pauseTimer);
+        fullscreenResetBtn.addEventListener('click', resetTimer);
+        dimModeBtn.addEventListener('click', toggleDimMode);
+        fullscreenDimBtn.addEventListener('click', toggleDimMode);
+        clearSessionsBtn.addEventListener('click', clearSessions);
+        
+        // Thoughts section event listeners
+        bulletListBtn.addEventListener('click', insertBulletList);
+        numberedListBtn.addEventListener('click', insertNumberedList);
+        clearThoughtsBtn.addEventListener('click', clearThoughts);
+        thoughtsContent.addEventListener('input', saveThoughts);
+        
+        // Sound button event listeners
+        soundBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectSound(btn.dataset.sound);
+            });
+        });
+
+        // Initialize the app
+        initializeWeeklyData();
+        loadData();
+        
+        // Generate audio tones on load
+        window.addEventListener('load', generateAudioTones);
+        
+        // Update NEET countdown every minute
+        updateNeetCountdown();
+        setInterval(updateNeetCountdown, 60000);
+    </script>
+</body>
+</html>
